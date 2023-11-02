@@ -1,4 +1,5 @@
-import { btnSubmit } from "./nuevocliente.js"
+const btnSubmit = document.querySelector("#formulario input[type='submit']")
+const listaClientes = document.querySelector("#listado-clientes")
 
 let db
 
@@ -26,8 +27,36 @@ function initializeDBStorage(e) {
     storage.createIndex("buscarNombre", "nombre", {unique: false})
 }
 
-export function showClients() {
-    
+export function getClients() {
+    clearClientsHTML()
+    let transaction = db.transaction("clientes")
+    let storage = transaction.objectStore("clientes")
+    let cursor = storage.openCursor()
+    cursor.addEventListener("success", showClients)
+}
+
+function showClients(e) {
+    const row = document.createElement("tr")
+    listaClientes.appendChild(row)
+    let cursor = e.target.result
+    if (cursor) {
+        let nameColumn = document.createElement("td")
+        let phoneColumn = document.createElement("td")
+        let companyColumn = document.createElement("td")
+        nameColumn.textContent = cursor.value.nombre
+        phoneColumn.textContent = cursor.value.telefono
+        companyColumn.textContent = cursor.value.empresa
+        row.appendChild(nameColumn)
+        row.appendChild(phoneColumn)
+        row.appendChild(companyColumn)
+        cursor.continue()
+    }
+}
+
+function clearClientsHTML() {
+    while (listaClientes.firstChild) {
+        listaMensajes.removeChild(listaMensajes.firstChild)
+    }
 }
 
 export function saveClient(event, nombreForm, correoForm, telefonoForm, empresaForm) {

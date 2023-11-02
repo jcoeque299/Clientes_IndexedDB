@@ -5,7 +5,6 @@ const email = document.querySelector("#email")
 const telefono = document.querySelector("#telefono")
 const empresa = document.querySelector("#empresa")
 const formulario = document.querySelector("#formulario")
-export const btnSubmit = document.querySelector("#formulario input[type='submit']")
 
 document.addEventListener("DOMContentLoaded", initializeDB)
 
