@@ -66,8 +66,8 @@ function clearClientsHTML() {
     }
 }
 
-export function saveClient(event, nombreForm, correoForm, telefonoForm, empresaForm) {
-    event.preventDefault()
+export function saveClient(e, nombreForm, correoForm, telefonoForm, empresaForm) {
+    e.preventDefault()
     let transaction = db.transaction("clientes", "readwrite")
     let storage = transaction.objectStore("clientes")
     storage.add({
@@ -78,14 +78,19 @@ export function saveClient(event, nombreForm, correoForm, telefonoForm, empresaF
     })
 }
 
-export function editClient(nombre, correo, telefono, empresa) {
+export function editClient(e, idForm, nombreForm, correoForm, telefonoForm, empresaForm) {
+    e.preventDefault()
     let transaction = db.transaction("clientes", "readwrite")
     let storage = transaction.objectStore("clientes")
-    storage.put({
-        nombre: nombre,
-        correo: correo,
-        telefono: telefono,
-        empresa: empresa
+    let request = storage.get(idForm)
+    request.addEventListener("success", function() {
+        storage.put({
+            nombre: nombreForm,
+            correo: correoForm,
+            telefono: telefonoForm,
+            empresa: empresaForm,
+            id: idForm
+        })
     })
 }
 
