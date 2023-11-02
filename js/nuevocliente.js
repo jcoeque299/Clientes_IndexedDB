@@ -12,4 +12,6 @@ nombre.addEventListener("blur", validateData)
 email.addEventListener("blur", validateData)
 telefono.addEventListener("blur", validateData)
 empresa.addEventListener("blur", validateData)
-btnSubmit.addEventListener("submit", saveClient(nombre, email, telefono, empresa))
+btnSubmit.addEventListener("submit", function() {
+    saveClient(nombre, email, telefono, empresa)
+})
