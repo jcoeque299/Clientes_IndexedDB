@@ -22,23 +22,28 @@ function startDB(e) {
 
 function initializeDBStorage(e) {
     let database = e.target.result
-    let storage = database.createObjectStore("clientes", {keyPath: "id"})
+    let storage = database.createObjectStore("clientes", {keyPath: "id", autoIncrement: true})
     storage.createIndex("buscarNombre", "nombre", {unique: false})
 }
 
-export function saveClient(nombre, correo, telefono, empresa) {
-    let transaction = db.transaction(["clientes"], "readwrite")
+export function showClients() {
+    
+}
+
+export function saveClient(event, nombreForm, correoForm, telefonoForm, empresaForm) {
+    event.preventDefault()
+    let transaction = db.transaction("clientes", "readwrite")
     let storage = transaction.objectStore("clientes")
     storage.add({
-        nombre: nombre,
-        correo: correo,
-        telefono: telefono,
-        empresa: empresa
+        nombre: nombreForm,
+        correo: correoForm,
+        telefono: telefonoForm,
+        empresa: empresaForm
     })
 }
 
 export function editClient(nombre, correo, telefono, empresa) {
-    let transaction = db.transaction(["clientes"], "readwrite")
+    let transaction = db.transaction("clientes", "readwrite")
     let storage = transaction.objectStore("clientes")
     storage.put({
         nombre: nombre,
