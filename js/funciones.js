@@ -43,19 +43,26 @@ function showClients(e) {
         let nameColumn = document.createElement("td")
         let phoneColumn = document.createElement("td")
         let companyColumn = document.createElement("td")
+        let deleteClientHTML = document.createElement("button")
+        deleteClientHTML.setAttribute("id", cursor.value.id)
+        deleteClientHTML.textContent = "Borrar"
         nameColumn.textContent = cursor.value.nombre
         phoneColumn.textContent = cursor.value.telefono
         companyColumn.textContent = cursor.value.empresa
         row.appendChild(nameColumn)
         row.appendChild(phoneColumn)
         row.appendChild(companyColumn)
+        row.append(deleteClientHTML)
+        deleteClientHTML.addEventListener("click", function() {
+            deleteClient(parseInt(deleteClientHTML.getAttribute("id")))
+        })
         cursor.continue()
     }
 }
 
 function clearClientsHTML() {
     while (listaClientes.firstChild) {
-        listaMensajes.removeChild(listaMensajes.firstChild)
+        listaClientes.removeChild(listaClientes.firstChild)
     }
 }
 
@@ -80,6 +87,13 @@ export function editClient(nombre, correo, telefono, empresa) {
         telefono: telefono,
         empresa: empresa
     })
+}
+
+function deleteClient(id) {
+    let transaction = db.transaction("clientes", "readwrite")
+    let storage = transaction.objectStore("clientes")
+    transaction.addEventListener("complete", getClients)
+    storage.delete(id)
 }
 
 export function validateData(e) {
