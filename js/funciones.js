@@ -10,6 +10,10 @@ const formData = {
     empresa: ""
 }
 
+if (document.querySelector("#id")) {
+    formData.id = ""
+}
+
 export function initializeDB() {
     let request = indexedDB.open("clientes")
 
@@ -104,6 +108,13 @@ function deleteClient(id) {
 export function validateData(e) {
     if (e.target.value.trim() === '') {
         showErrorAlert(`El campo ${e.target.id} es obligatorio`, e.target.parentElement)
+        formData[e.target.name] = ""
+        console.log(formData)
+        enableOrDisableSubmitButton()
+        return
+    }
+    if (e.target.id === 'id' && isNaN(e.target.value)) {
+        showErrorAlert('La ID no es válida', e.target.parentElement)
         formData[e.target.name] = ""
         console.log(formData)
         enableOrDisableSubmitButton()
