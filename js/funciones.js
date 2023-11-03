@@ -125,7 +125,7 @@ export function saveClient(e, nombreForm, correoForm, telefonoForm, empresaForm)
         telefono: telefonoForm,
         empresa: empresaForm
     })
-    showOKMessage(formulario)
+    showOKMessage("Cliente añadido con exito", formulario)
 }
 
 export function editClient(e, idForm, nombreForm, correoForm, telefonoForm, empresaForm) {
@@ -143,7 +143,7 @@ export function editClient(e, idForm, nombreForm, correoForm, telefonoForm, empr
                 id: idForm
             })
             clearErrorAlert(formulario)
-            showOKMessage(formulario)
+            showOKMessage("Cliente editado con exito", formulario)
         }
         else {
             showErrorAlert("Cliente no encontrado", formulario)
@@ -172,34 +172,29 @@ export function validateData(e) {
     if (e.target.value.trim() === '') {
         showErrorAlert(`El campo ${e.target.id} es obligatorio`, e.target.parentElement)
         formData[e.target.name] = ""
-        console.log(formData)
         enableOrDisableSubmitButton()
         return
     }
     if (e.target.id === 'id' && isNaN(e.target.value)) {
         showErrorAlert('La ID no es válida', e.target.parentElement)
         formData[e.target.name] = ""
-        console.log(formData)
         enableOrDisableSubmitButton()
         return
     }
     if (e.target.id === 'email' && !validateEmail(e.target.value)) {
         showErrorAlert('El email no es válido', e.target.parentElement)
         formData[e.target.name] = ""
-        console.log(formData)
         enableOrDisableSubmitButton()
         return
     }
     if (e.target.id === 'telefono' && !validatePhoneNumber(e.target.value)) {
         showErrorAlert('El telefono no es válido', e.target.parentElement)
         formData[e.target.name] = ""
-        console.log(formData)
         enableOrDisableSubmitButton()
         return
     }
     clearErrorAlert(e.target.parentElement)
     formData[e.target.name] = e.target.value.trim().toLowerCase()
-    console.log(formData)
     enableOrDisableSubmitButton()
 }
 
@@ -234,6 +229,18 @@ function clearErrorAlert(location) {
     }
 }
 
+function showOKMessage(message, location) {
+    const alertaExito = document.createElement('p')
+        alertaExito.classList.add('bg-green-500', 'text-white', 'p-2', 'text-center', 'rounded-lg', 'mt-10', 'font-bold', 'text-sm', 'uppercase')
+        alertaExito.textContent = message
+
+        location.appendChild(alertaExito)
+
+        setTimeout(() => {
+            alertaExito.remove()
+        }, 3000)
+}
+
 function enableOrDisableSubmitButton() {
     const values = Object.values(formData)
     if (values.includes("")) {
@@ -243,21 +250,4 @@ function enableOrDisableSubmitButton() {
     }
     btnSubmit.classList.remove("opacity-50")
     btnSubmit.disabled = false
-}
-
-function showOKMessage(location) {
-    const alertaExito = document.createElement('p')
-      alertaExito.classList.add('bg-green-500', 'text-white', 'p-2', 'text-center', 'rounded-lg', 'mt-10', 'font-bold', 'text-sm', 'uppercase')
-      if (formData.id) {
-        alertaExito.textContent = 'Cliente editado correctamente'
-      }
-      else {
-        alertaExito.textContent = 'Cliente añadido correctamente'
-      }
-
-      location.appendChild(alertaExito)
-
-      setTimeout(() => {
-        alertaExito.remove()
-    }, 3000)
 }
