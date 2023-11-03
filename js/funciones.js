@@ -1,5 +1,10 @@
 const btnSubmit = document.querySelector("#formulario input[type='submit']")
 const id = document.querySelector("#id")
+const nombre = document.querySelector("#nombre")
+const email = document.querySelector("#email")
+const telefono = document.querySelector("#telefono")
+const empresa = document.querySelector("#empresa")
+const formulario = document.querySelector("#formulario")
 const listaClientes = document.querySelector("#listado-clientes")
 
 let db
@@ -45,43 +50,63 @@ function showClients(e) {
     listaClientes.appendChild(row)
     let cursor = e.target.result
     if (cursor) {
+        
+        //Si este objeto no existe y se usa la funcion de editar cliente usando los datos directamente del cursor, dara una excepción "cursor.value not defined"
+        const cursorData = {
+            "id": cursor.value.id,
+            "nombre": cursor.value.nombre,
+            "telefono": cursor.value.telefono,
+            "email": cursor.value.correo,
+            "empresa": cursor.value.empresa
+        }
 
         let idColumn = document.createElement("td")
         let nameColumn = document.createElement("td")
+        let emailColumn = document.createElement("td")
         let phoneColumn = document.createElement("td")
         let companyColumn = document.createElement("td")
         let editClientHTML = document.createElement("button")
         let deleteClientHTML = document.createElement("button")
 
-        idColumn.textContent = cursor.value.id
-        nameColumn.textContent = cursor.value.nombre
-        phoneColumn.textContent = cursor.value.telefono
-        companyColumn.textContent = cursor.value.empresa
+        idColumn.textContent = cursorData.id
+        nameColumn.textContent = cursorData.nombre
+        emailColumn.textContent = cursorData.email
+        phoneColumn.textContent = cursorData.telefono
+        companyColumn.textContent = cursorData.empresa
 
-        editClientHTML.id = cursor.value.id
         editClientHTML.style.margin = "5px"
         editClientHTML.textContent = "Editar"
 
-        deleteClientHTML.id = cursor.value.id
         deleteClientHTML.textContent = "Borrar"
         deleteClientHTML.style.margin = "5px"
 
         row.appendChild(idColumn)
         row.appendChild(nameColumn)
+        row.appendChild(emailColumn)
         row.appendChild(phoneColumn)
         row.appendChild(companyColumn)
         row.appendChild(editClientHTML)
         row.appendChild(deleteClientHTML)
-
-        editClientHTML.addEventListener("click", function() {
-            sessionStorage.setItem("id", editClientHTML.getAttribute("id"))
-            window.location.href = "editar-cliente.html"
-        })
-        deleteClientHTML.addEventListener("click", function() {
-            deleteClient(parseInt(deleteClientHTML.getAttribute("id")))
-        })
+        
+        createClientHTMLListeners(editClientHTML, deleteClientHTML, cursorData)
+        
         cursor.continue()
     }
+}
+
+function createClientHTMLListeners(editClientHTML, deleteClientHTML, cursorData) {
+    //Almacenamiento temporal de datos para pasarlos a editar-cliente.html mediante la funcion retrieveClientToEditId
+    editClientHTML.addEventListener("click", function() {
+        sessionStorage.setItem("id", cursorData.id)
+        sessionStorage.setItem("nombre", cursorData.nombre)
+        sessionStorage.setItem("telefono", cursorData.telefono)
+        sessionStorage.setItem("email", cursorData.email)
+        sessionStorage.setItem("empresa", cursorData.empresa)
+        window.location.href = "editar-cliente.html"
+    })
+    deleteClientHTML.addEventListener("click", function() {
+        deleteClient(parseInt(cursorData.id))
+    })
 }
 
 function clearClientsHTML() {
@@ -100,7 +125,7 @@ export function saveClient(e, nombreForm, correoForm, telefonoForm, empresaForm)
         telefono: telefonoForm,
         empresa: empresaForm
     })
-    showOKMessage()
+    showOKMessage(formulario)
 }
 
 export function editClient(e, idForm, nombreForm, correoForm, telefonoForm, empresaForm) {
@@ -109,19 +134,30 @@ export function editClient(e, idForm, nombreForm, correoForm, telefonoForm, empr
     let storage = transaction.objectStore("clientes")
     let request = storage.get(idForm)
     request.addEventListener("success", function() {
-        storage.put({
-            nombre: nombreForm,
-            correo: correoForm,
-            telefono: telefonoForm,
-            empresa: empresaForm,
-            id: idForm
-        })
+        if (request.result !== undefined) {
+            storage.put({
+                nombre: nombreForm,
+                correo: correoForm,
+                telefono: telefonoForm,
+                empresa: empresaForm,
+                id: idForm
+            })
+            clearErrorAlert(formulario)
+            showOKMessage(formulario)
+        }
+        else {
+            showErrorAlert("Cliente no encontrado", formulario)
+        }
     })
-    showOKMessage()
+    
 }
 
 export function retrieveClientToEditId() {
     id.value = sessionStorage.getItem("id")
+    nombre.value = sessionStorage.getItem("nombre")
+    email.value = sessionStorage.getItem("email")
+    telefono.value = sessionStorage.getItem("telefono")
+    empresa.value = sessionStorage.getItem("empresa")
     sessionStorage.clear()
 }
 
@@ -209,7 +245,7 @@ function enableOrDisableSubmitButton() {
     btnSubmit.disabled = false
 }
 
-function showOKMessage() {
+function showOKMessage(location) {
     const alertaExito = document.createElement('p')
       alertaExito.classList.add('bg-green-500', 'text-white', 'p-2', 'text-center', 'rounded-lg', 'mt-10', 'font-bold', 'text-sm', 'uppercase')
       if (formData.id) {
@@ -219,7 +255,7 @@ function showOKMessage() {
         alertaExito.textContent = 'Cliente añadido correctamente'
       }
 
-      formulario.appendChild(alertaExito)
+      location.appendChild(alertaExito)
 
       setTimeout(() => {
         alertaExito.remove()
