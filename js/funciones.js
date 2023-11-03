@@ -1,4 +1,5 @@
 const btnSubmit = document.querySelector("#formulario input[type='submit']")
+const id = document.querySelector("#id")
 const listaClientes = document.querySelector("#listado-clientes")
 
 let db
@@ -44,19 +45,38 @@ function showClients(e) {
     listaClientes.appendChild(row)
     let cursor = e.target.result
     if (cursor) {
+
+        let idColumn = document.createElement("td")
         let nameColumn = document.createElement("td")
         let phoneColumn = document.createElement("td")
         let companyColumn = document.createElement("td")
+        let editClientHTML = document.createElement("button")
         let deleteClientHTML = document.createElement("button")
-        deleteClientHTML.setAttribute("id", cursor.value.id)
-        deleteClientHTML.textContent = "Borrar"
+
+        idColumn.textContent = cursor.value.id
         nameColumn.textContent = cursor.value.nombre
         phoneColumn.textContent = cursor.value.telefono
         companyColumn.textContent = cursor.value.empresa
+
+        editClientHTML.id = cursor.value.id
+        editClientHTML.style.margin = "5px"
+        editClientHTML.textContent = "Editar"
+
+        deleteClientHTML.id = cursor.value.id
+        deleteClientHTML.textContent = "Borrar"
+        deleteClientHTML.style.margin = "5px"
+
+        row.appendChild(idColumn)
         row.appendChild(nameColumn)
         row.appendChild(phoneColumn)
         row.appendChild(companyColumn)
-        row.append(deleteClientHTML)
+        row.appendChild(editClientHTML)
+        row.appendChild(deleteClientHTML)
+
+        editClientHTML.addEventListener("click", function() {
+            sessionStorage.setItem("id", editClientHTML.getAttribute("id"))
+            window.location.href = "editar-cliente.html"
+        })
         deleteClientHTML.addEventListener("click", function() {
             deleteClient(parseInt(deleteClientHTML.getAttribute("id")))
         })
@@ -80,6 +100,7 @@ export function saveClient(e, nombreForm, correoForm, telefonoForm, empresaForm)
         telefono: telefonoForm,
         empresa: empresaForm
     })
+    showOKMessage()
 }
 
 export function editClient(e, idForm, nombreForm, correoForm, telefonoForm, empresaForm) {
@@ -96,6 +117,12 @@ export function editClient(e, idForm, nombreForm, correoForm, telefonoForm, empr
             id: idForm
         })
     })
+    showOKMessage()
+}
+
+export function retrieveClientToEditId() {
+    id.value = sessionStorage.getItem("id")
+    sessionStorage.clear()
 }
 
 function deleteClient(id) {
@@ -149,7 +176,7 @@ function validateEmail(email) {
 }
 
 function validatePhoneNumber(phone) {
-    const validation = new RegExp('^[0-9]{2,3}-? ?[0-9]{6,7}$')
+    const validation = new RegExp(/^\+?(6\d{2}|7[1-9]\d{1})\d{6}$/)
     if (validation.test(phone)) {
         return true
     }
@@ -180,4 +207,21 @@ function enableOrDisableSubmitButton() {
     }
     btnSubmit.classList.remove("opacity-50")
     btnSubmit.disabled = false
+}
+
+function showOKMessage() {
+    const alertaExito = document.createElement('p')
+      alertaExito.classList.add('bg-green-500', 'text-white', 'p-2', 'text-center', 'rounded-lg', 'mt-10', 'font-bold', 'text-sm', 'uppercase')
+      if (formData.id) {
+        alertaExito.textContent = 'Cliente editado correctamente'
+      }
+      else {
+        alertaExito.textContent = 'Cliente añadido correctamente'
+      }
+
+      formulario.appendChild(alertaExito)
+
+      setTimeout(() => {
+        alertaExito.remove()
+    }, 3000)
 }

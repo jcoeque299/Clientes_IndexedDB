@@ -1,4 +1,4 @@
-import { initializeDB, editClient, validateData} from "./funciones.js"
+import { initializeDB, retrieveClientToEditId, editClient, validateData} from "./funciones.js"
 
 const id = document.querySelector("#id")
 const nombre = document.querySelector("#nombre")
@@ -7,7 +7,10 @@ const telefono = document.querySelector("#telefono")
 const empresa = document.querySelector("#empresa")
 const formulario = document.querySelector("#formulario")
 
-document.addEventListener("DOMContentLoaded", initializeDB)
+document.addEventListener("DOMContentLoaded", function() {
+    initializeDB()
+    retrieveClientToEditId()
+})
 
 id.addEventListener("blur", validateData)
 nombre.addEventListener("blur", validateData)
